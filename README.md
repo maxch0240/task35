@@ -5,3 +5,5 @@ In the file https://dl.dropboxusercontent.com/s/xu288ygtz0tcqny/products.csv?dl=
 
 It is necessary to determine the product that brought the maximum profit for each day of the month.
 As an answer, enter the NAME of the leader's product for the date 2021-01-21.
+
+Result: name: raisins
