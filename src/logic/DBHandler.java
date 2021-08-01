@@ -4,10 +4,7 @@ import model.OrderItems;
 import model.Orders;
 import model.Products;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 public class DBHandler {
@@ -16,14 +13,22 @@ public class DBHandler {
     public DBHandler(String url, String username, String password) throws ClassNotFoundException {
         Class.forName("com.mysql.cj.jdbc.Driver");
 
-        try{
-            conn = DriverManager.getConnection(url,username,password);
-            System.out.println("законнектило");
-        } catch(SQLException e)
-        {
-            System.out.println("не прокатило");
+        try {
+            conn = DriverManager.getConnection(url, username, password);
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public void clearUpTables() throws SQLException {
+        Statement st = conn.createStatement();
+        String sql1 = "truncate table orders;";
+        String sql2 = "truncate table order_items;";
+        String sql3 = "truncate table products;";
+
+        st.executeUpdate(sql1);
+        st.executeUpdate(sql2);
+        st.executeUpdate(sql3);
     }
 
     public void fillTableOrders(List<Orders> ordersList) throws SQLException {
@@ -62,10 +67,25 @@ public class DBHandler {
     }
 
 
-//    for each day of the month, determine the product that brought the maximum profit.
+    //    for each day of the month, determine the product that brought the maximum profit.
 //    As an answer, enter the NAME of the leader's product for the date 2021-01-21.
-    public String sqlScript() {
+    public String sqlQuery() throws SQLException {
         String result;
-        return "";
+        String query = "select p.name from orders as o \n" +
+                "inner join order_items as oi on o.id = oi.order_id\n" +
+                "inner join products as p on oi.product_id = p.id\n" +
+                "where date_format(o.date_time, '%Y-%m-%d') = '2021-01-21'\n" +
+                "group by dayofmonth(o.date_time)\n" +
+                "order by max(oi.quantity * p.price_per_unit) desc\n" +
+                "limit 1;";
+
+        Statement statement = conn.createStatement();
+
+        ResultSet resultSet = statement.executeQuery(query);
+
+        resultSet.next();
+        result = resultSet.getString(1);
+
+        return result;
     }
 }
